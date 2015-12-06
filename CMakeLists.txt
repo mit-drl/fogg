@@ -24,9 +24,10 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  include
 )
 
-add_executable(pcl_example src/pcl_example.cpp)
+add_executable(pcl_example src/pcl_example.cpp src/EuclideanClusterExtraction.cpp)
 target_link_libraries(pcl_example ${catkin_LIBRARIES})
 add_executable(pcl_test src/pcl_test.cpp)
 target_link_libraries(pcl_test ${catkin_LIBRARIES})
