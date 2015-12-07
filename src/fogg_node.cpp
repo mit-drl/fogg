@@ -37,7 +37,7 @@ void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& input)
         }
         pc.channels.push_back(ch);
         pc_pub.publish(pc);
-        oc.generate_grid(clusters, ece.cloud);
+        oc.generate_grid(clusters);
         og_pub.publish(oc.og);
     }
 
