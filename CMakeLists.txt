@@ -27,5 +27,5 @@ include_directories(
   include
 )
 
-add_executable(fogg_node src/fogg_node.cpp src/clustering.cpp)
+add_executable(fogg_node src/fogg_node.cpp src/clustering.cpp src/occupancy.cpp)
 target_link_libraries(fogg_node ${catkin_LIBRARIES})

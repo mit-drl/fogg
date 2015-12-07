@@ -1,4 +1,5 @@
 
+#include "fogg/occupancy.hpp"
 #include "fogg/fogg_node.hpp"
 
 ros::Publisher pub;
@@ -14,6 +15,7 @@ using namespace std;
 void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& input)
 {
     ece.get_euclidean_clusters(input, clusters);
+    nav_msgs::OccupancyGrid og;
     if (clusters.size() > 0)
     {
         sensor_msgs::PointCloud pc;

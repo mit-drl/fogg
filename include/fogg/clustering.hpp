@@ -42,8 +42,6 @@ class Clustering {
         void set_min_cluster_size(int size);
         void set_max_cluster_size(int size);
         void filter_depth(PCLPointCloudPtr& cloud, PCLPointCloudPtr& cloud_f);
-        void get_occupancy_grid(vector<PCLPointCloudPtr> clusters,
-            nav_msgs::OccupancyGrid& og);
         void get_euclidean_clusters(
                 const sensor_msgs::PointCloud2ConstPtr& input,
                 vector<PCLPointCloudPtr>& clusters);
