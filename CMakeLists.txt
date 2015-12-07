@@ -27,7 +27,5 @@ include_directories(
   include
 )
 
-add_executable(pcl_example src/pcl_example.cpp src/EuclideanClusterExtraction.cpp)
-target_link_libraries(pcl_example ${catkin_LIBRARIES})
-add_executable(pcl_test src/pcl_test.cpp)
-target_link_libraries(pcl_test ${catkin_LIBRARIES})
+add_executable(fogg_node src/fogg_node.cpp src/clustering.cpp)
+target_link_libraries(fogg_node ${catkin_LIBRARIES})
