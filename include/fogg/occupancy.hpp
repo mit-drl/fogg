@@ -3,18 +3,23 @@
 
 #include <nav_msgs/OccupancyGrid.h>
 #include <pcl/point_types.h>
+#include "fogg/clustering.hpp"
 
 #define INVALID -2
 
 class Occupancy
 {
     private:
-        nav_msgs::OccupancyGrid *og;
+        float resolution;
 
     public:
+        nav_msgs::OccupancyGrid og;
         Occupancy() {};
+        Occupancy(float resolution);
         ~Occupancy() {};
-        void set_occupancy_grid(nav_msgs::OccupancyGrid *og);
+        void setup_og(PCLPointCloudPtr& cloud);
+        void generate_grid(vector<PCLPointCloudPtr>& clusters,
+                PCLPointCloudPtr& cloud);
         void point_to_grid(pcl::PointXYZ& p, int& i, int& j);
         void set(int i, int j, int val);
         void set(pcl::PointXYZ& p, int val);

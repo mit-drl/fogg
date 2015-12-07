@@ -1,5 +1,5 @@
-#ifndef EUCLIDEAN_CLUSTER_EXTRACTION_HPP
-#define EUCLIDEAN_CLUSTER_EXTRACTION_HPP
+#ifndef CLUSTERING_HPP
+#define CLUSTERING_HPP
 
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -24,7 +24,6 @@ typedef pcl::FieldComparison<pcl::PointXYZ>::ConstPtr PCLFieldCompConstPtr;
 class Clustering {
 
     private:
-        PCLPointCloudPtr cloud, cloud_f, cloud_filtered;
         PCLConditionPtr range_cond;
         PCLFieldCompConstPtr min_comp, max_comp;
         pcl::search::KdTree<pcl::PointXYZ>::Ptr tree;
@@ -33,6 +32,7 @@ class Clustering {
         float depth_min, depth_max;
 
     public:
+        PCLPointCloudPtr cloud, cloud_f, cloud_filtered;
         Clustering(float depth_min, float depth_max);
         Clustering() {};
         ~Clustering() {};

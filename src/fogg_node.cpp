@@ -2,8 +2,9 @@
 #include "fogg/occupancy.hpp"
 #include "fogg/fogg_node.hpp"
 
-ros::Publisher pub;
+ros::Publisher pc_pub, og_pub;
 Clustering ece;
+Occupancy oc;
 vector<PCLPointCloudPtr> clusters;
 string depth_topic;
 float leaf_x, leaf_y, leaf_z, cluster_tolerance, depth_min, depth_max;
@@ -15,7 +16,6 @@ using namespace std;
 void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& input)
 {
     ece.get_euclidean_clusters(input, clusters);
-    nav_msgs::OccupancyGrid og;
     if (clusters.size() > 0)
     {
         sensor_msgs::PointCloud pc;
@@ -36,7 +36,9 @@ void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& input)
             }
         }
         pc.channels.push_back(ch);
-        pub.publish(pc);
+        pc_pub.publish(pc);
+        oc.generate_grid(clusters, ece.cloud);
+        og_pub.publish(oc.og);
     }
 
 }
@@ -56,13 +58,14 @@ int main (int argc, char** argv)
     ros::param::get("~depth_max", depth_max);
 
     ece = Clustering(depth_min, depth_max);
+    oc = Occupancy(0.03);
     ece.set_leaf_size(leaf_x, leaf_y, leaf_z);
     ece.set_cluster_tolerance(cluster_tolerance);
     ece.set_min_cluster_size(min_cs);
     ece.set_max_cluster_size(max_cs);
 
-    pub = nh.advertise<sensor_msgs::PointCloud>("fogg_clusters", 1);
-    // pub = nh.advertise<nav_msgs::OccupancyGrid>("fogg_grid", 1);
+    pc_pub = nh.advertise<sensor_msgs::PointCloud>("fogg_clusters", 1);
+    og_pub = nh.advertise<nav_msgs::OccupancyGrid>("fogg_grid", 1);
     ros::Subscriber sub = nh.subscribe(depth_topic, 1, cloud_cb);
     ros::spin();
 }
