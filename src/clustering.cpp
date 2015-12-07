@@ -50,6 +50,16 @@ void Clustering::filter_depth(PCLPointCloudPtr& cloud,
     condrem.filter(*cloud_f);
 }
 
+void Clustering::get_occupancy_grid(vector<PCLPointCloudPtr> clusters,
+        nav_msgs::OccupancyGrid& og)
+{
+    og.info.resolution = 0.2;
+    og.info.width = 100;
+    og.info.height = 100;
+    og.header.stamp = ros::Time::now();
+    og.header.frame_id = "camera_link";
+}
+
 void Clustering::get_euclidean_clusters(
         const sensor_msgs::PointCloud2ConstPtr& input,
         vector<PCLPointCloudPtr>& clusters)

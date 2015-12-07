@@ -60,6 +60,7 @@ int main (int argc, char** argv)
     ece.set_max_cluster_size(max_cs);
 
     pub = nh.advertise<sensor_msgs::PointCloud>("fogg_clusters", 1);
+    // pub = nh.advertise<nav_msgs::OccupancyGrid>("fogg_grid", 1);
     ros::Subscriber sub = nh.subscribe(depth_topic, 1, cloud_cb);
     ros::spin();
 }
