@@ -1,18 +1,17 @@
-#include <ros/ros.h>
-#include <sensor_msgs/PointCloud.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/ChannelFloat32.h>
-#include <geometry_msgs/Point32.h>
-#include "fogg/clustering.hpp"
+
+#include "fogg/fogg_node.hpp"
 
 ros::Publisher pub;
 Clustering ece;
 vector<PCLPointCloudPtr> clusters;
-int j = 0;
+string depth_topic;
+float leaf_x, leaf_y, leaf_z, cluster_tolerance, depth_min, depth_max;
+int min_cs, max_cs;
+int pc_counter = 0;
 
 using namespace std;
 
-void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
+void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& input)
 {
     ece.get_euclidean_clusters(input, clusters);
     if (clusters.size() > 0)
@@ -21,15 +20,15 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
         sensor_msgs::ChannelFloat32 ch;
         pc.header.stamp = ros::Time::now();
         pc.header.frame_id = "camera_link";
-        pc.header.seq = j++;
+        pc.header.seq = pc_counter++;
         ch.name = "category";
 
         for (int i = 0; i < clusters.size(); i++) {
-            for (int k = 0; k < clusters[i]->points.size(); k++) {
+            for (int j = 0; j < clusters[i]->points.size(); j++) {
                 geometry_msgs::Point32 p;
-                p.x = clusters[i]->points[k].x;
-                p.y = clusters[i]->points[k].y;
-                p.z = clusters[i]->points[k].z;
+                p.x = clusters[i]->points[j].z;
+                p.y = -clusters[i]->points[j].x;
+                p.z = -clusters[i]->points[j].y;
                 pc.points.push_back(p);
                 ch.values.push_back(i);
             }
@@ -40,12 +39,27 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
 }
 
-
 int main (int argc, char** argv)
 {
     ros::init (argc, argv, "fogg_node");
     ros::NodeHandle nh;
-    pub = nh.advertise<sensor_msgs::PointCloud>("clusters", 1);
-    ros::Subscriber sub = nh.subscribe("input", 1, cloud_cb);
+    ros::param::get("~leaf_x", leaf_x);
+    ros::param::get("~leaf_y", leaf_y);
+    ros::param::get("~leaf_z", leaf_z);
+    ros::param::get("~cluster_tolerance", cluster_tolerance);
+    ros::param::get("~min_cluster_size", min_cs);
+    ros::param::get("~max_cluster_size", max_cs);
+    ros::param::get("~depth_topic", depth_topic);
+    ros::param::get("~depth_min", depth_min);
+    ros::param::get("~depth_max", depth_max);
+
+    ece = Clustering(depth_min, depth_max);
+    ece.set_leaf_size(leaf_x, leaf_y, leaf_z);
+    ece.set_cluster_tolerance(cluster_tolerance);
+    ece.set_min_cluster_size(min_cs);
+    ece.set_max_cluster_size(max_cs);
+
+    pub = nh.advertise<sensor_msgs::PointCloud>("fogg_clusters", 1);
+    ros::Subscriber sub = nh.subscribe(depth_topic, 1, cloud_cb);
     ros::spin();
 }

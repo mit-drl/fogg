@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="fogg" type="fogg_node" name="fogg" output="screen">
+        <rosparam>
+            leaf_x: 0.03
+            leaf_y: 0.03
+            leaf_z: 0.01
+            cluster_tolerance: 0.03
+            min_cluster_size: 400
+            max_cluster_size: 5000
+            depth_min: 0
+            depth_max: 1.8
+            depth_topic: /camera/depth/points
+        </rosparam>
+    </node>
+</launch>

@@ -1,24 +1,62 @@
 
 #include "fogg/clustering.hpp"
 
-Clustering::Clustering() :
+Clustering::Clustering(float depth_min, float depth_max) :
+    depth_min(depth_min), depth_max(depth_max),
     cloud(new pcl::PointCloud<pcl::PointXYZ>),
     cloud_f(new pcl::PointCloud<pcl::PointXYZ>),
     cloud_filtered(new pcl::PointCloud<pcl::PointXYZ>),
-    tree(new pcl::search::KdTree<pcl::PointXYZ>)
+    tree(new pcl::search::KdTree<pcl::PointXYZ>),
+    range_cond(new pcl::ConditionAnd<pcl::PointXYZ>()),
+    min_comp(new pcl::FieldComparison<pcl::PointXYZ>("z",
+                pcl::ComparisonOps::GT, depth_min)),
+    max_comp(new pcl::FieldComparison<pcl::PointXYZ>("z",
+                pcl::ComparisonOps::LT, depth_max))
 {
     vg.setLeafSize(0.03f, 0.03f, 0.01f);
     ec.setClusterTolerance (0.03);
     ec.setMinClusterSize(400);
     ec.setMaxClusterSize(5000);
+    range_cond->addComparison(min_comp);
+    range_cond->addComparison(max_comp);
 };
+
+void Clustering::set_leaf_size(float lx, float ly, float lz)
+{
+    vg.setLeafSize(lx, ly, lz);
+}
+
+void Clustering::set_cluster_tolerance(float d)
+{
+    ec.setClusterTolerance(d);
+}
+
+void Clustering::set_min_cluster_size(int size)
+{
+    ec.setMinClusterSize(size);
+}
+
+void Clustering::set_max_cluster_size(int size)
+{
+    ec.setMaxClusterSize(size);
+}
+
+void Clustering::filter_depth(PCLPointCloudPtr& cloud,
+        PCLPointCloudPtr& cloud_f)
+{
+    pcl::ConditionalRemoval<pcl::PointXYZ> condrem(range_cond);
+    condrem.setInputCloud(cloud);
+    condrem.setKeepOrganized(true);
+    condrem.filter(*cloud_f);
+}
 
 void Clustering::get_euclidean_clusters(
         const sensor_msgs::PointCloud2ConstPtr& input,
         vector<PCLPointCloudPtr>& clusters)
 {
     pcl::fromROSMsg(*input, *cloud);
-    vg.setInputCloud(cloud);
+    filter_depth(cloud, cloud_f);
+    vg.setInputCloud(cloud_f);
     vg.filter(*cloud_filtered);
 
     tree->setInputCloud(cloud_filtered);
