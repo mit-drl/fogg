@@ -30,12 +30,8 @@ class Occupancy
         Occupancy(float resolution, float width, float height);
         ~Occupancy() {};
         void generate_grid(vector<PCLPointCloudPtr>& clusters);
-        void estimate_cylinders(vector<PCLPointCloudPtr>& clusters,
-                vector<PCLModelPtr>& models, vector<PCLPointCloudPtr>& cyls);
         void point_to_grid(pcl::PointXYZ& p, int& i, int& j);
         void grid_to_point(int i, int j, pcl::PointXYZ& p);
-        bool inside_cylinder(int i, int j, PCLModelPtr& model);
-        bool inside_cylinder(pcl::PointXYZ& p, PCLModelPtr& model);
         void set(int i, int j, int val);
         void set(pcl::PointXYZ& p, int val);
         int get(int i, int j);

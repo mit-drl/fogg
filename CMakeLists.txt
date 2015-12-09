@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   pcl_conversions
   pcl_msgs
+  OpenCV
 )
 
 catkin_package(
@@ -24,8 +25,9 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
   include
 )
 
 add_executable(fogg_node src/fogg_node.cpp src/clustering.cpp src/occupancy.cpp)
-target_link_libraries(fogg_node ${catkin_LIBRARIES})
+target_link_libraries(fogg_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
