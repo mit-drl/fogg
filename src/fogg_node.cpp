@@ -7,7 +7,8 @@ Clustering ece;
 Occupancy oc;
 vector<PCLPointCloudPtr> clusters;
 string depth_topic;
-float leaf_x, leaf_y, leaf_z, cluster_tolerance, depth_min, depth_max;
+float leaf_x, leaf_y, leaf_z, cluster_tolerance, depth_min, depth_max,
+      occ_width, occ_height, occ_resolution;
 int min_cs, max_cs;
 int pc_counter = 0;
 
@@ -38,7 +39,7 @@ void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& input)
         pc.channels.push_back(ch);
         pc_pub.publish(pc);
         oc.generate_grid(clusters);
-        og_pub.publish(oc.og);
+        og_pub.publish(*oc.get_grid());
     }
 
 }
@@ -56,9 +57,12 @@ int main (int argc, char** argv)
     ros::param::get("~depth_topic", depth_topic);
     ros::param::get("~depth_min", depth_min);
     ros::param::get("~depth_max", depth_max);
+    ros::param::get("~occ_width", occ_width);
+    ros::param::get("~occ_height", occ_height);
+    ros::param::get("~occ_resolution", occ_resolution);
 
     ece = Clustering(depth_min, depth_max);
-    oc = Occupancy(0.03);
+    oc = Occupancy(occ_resolution, occ_height, occ_width);
     ece.set_leaf_size(leaf_x, leaf_y, leaf_z);
     ece.set_cluster_tolerance(cluster_tolerance);
     ece.set_min_cluster_size(min_cs);

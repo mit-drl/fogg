@@ -11,6 +11,10 @@
             depth_min: 0
             depth_max: 1.8
             depth_topic: /camera/depth/points
+            occ_resolution: 0.03
+            occ_width: 3
+            occ_height: 3
         </rosparam>
     </node>
+    <include file="$(find freenect_launch)/launch/freenect.launch"/>
 </launch>
