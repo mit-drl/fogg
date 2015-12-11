@@ -38,27 +38,30 @@ void Occupancy::generate_grid(vector<PCLPointCloudPtr>& clusters)
 
     for (int i = 0; i < clusters.size(); i++)
     {
-        vector<cv::Point2f> cv_pts;
+        vector<cv::Point> cv_pts;
         for (int j = 0; j < clusters[i]->points.size(); j++)
         {
-            cv::Point2f p;
+            cv::Point p;
             p.x = -clusters[i]->points[j].x;
             p.y = clusters[i]->points[j].z;
             cv_pts.push_back(p);
-            set(clusters[i]->points[j], 100);
+            // set(clusters[i]->points[j], 100);
         }
-
-        // cv::RotatedRect rect = cv::fitEllipse(cv_pts);
-        // for (int k = 0; k < og.info.height; k++)
-        // {
-        //     for (int l = 0; l < og.info.width; l++)
-        //     {
-        //         if (inside_rectangle(k, l, rect))
-        //         {
-        //             set(k, l, 100);
-        //         }
-        //     }
-        // }
+        cv::Point2f center;
+        float radius;
+        cv::minEnclosingCircle(cv_pts, center, radius);
+        cout << center << endl;
+        for (int k = 0; k < og.info.height; k++)
+        {
+            for (int l = 0; l < og.info.width; l++)
+            {
+                pcl::PointXYZ p;
+                grid_to_point(k, l, p);
+                if (sqrtf(powf(p.x - center.x, 2) + powf(p.y - center.y, 2)) < radius) {
+                    set(k, l, 100);
+                }
+            }
+        }
     }
 
 }
@@ -85,29 +88,24 @@ bool Occupancy::inside_rectangle(int i, int j, cv::RotatedRect& rect)
 bool Occupancy::inside_rectangle(pcl::PointXYZ& p_, cv::RotatedRect& rect)
 {
     cv::Point2f pts[4];
-    rect.points(pts);
     cv::Point2f p;
     p.x = p_.x;
     p.y = p_.y;
     rect.points(pts);
-    float s, ra, apd, dpc, cpb, pba;
-    cv::Point2f a = pts[0], b = pts[1], c = pts[2], d = pts[3];
-    cv::Point2f tapd[] = {a, p, d};
-    apd = triangle_area(tapd);
-    cv::Point2f tdpc[] = {d, p, c};
-    dpc = triangle_area(tdpc);
-    cv::Point2f tcpb[] = {c, p, b};
-    cpb = triangle_area(tcpb);
-    cv::Point2f tpba[] = {p, b, a};
-    pba = triangle_area(tpba);
-    s = apd + dpc + cpb + pba;
-    ra = rect.size.width * rect.size.height;
-    return s <= ra;
+    float apd, dpc, cpb, pba, a = pts[0], b = pts[1], c = pts[2];
+    cv::Point2f tri[] = {a, p, d};
+    apd = triangle_area(tri);
+    cv::Point2f tri[] = {d, p, c};
+    dpc = triangle_area(tri);
+    cv::Point2f tri[] = {c, p, b};
+    cpb = triangle_area(tri);
+    cv::Point2f tri[] = {p, b, a};
+    pba = triangle_area(tri);
 }
 
-float Occupancy::triangle_area(cv::Point2f pts[3]) {
+float Occupancy::triangle_area(cv::Point2f pts) {
     float A, B, C;
-    cv::Point2f a = pts[0], b = pts[1], c = pts[2];
+    float a = pts[0], b = pts[1], c = pts[2];
     A = a.x * (b.y - c.y);
     B = b.x * (c.y - a.y);
     C = c.x * (a.y - b.y);
