@@ -38,6 +38,7 @@ class Occupancy
         bool inside_rectangle(int i, int j, cv::RotatedRect& rect);
         bool inside_rectangle(pcl::PointXYZ& p, cv::RotatedRect& rect);
         float triangle_area(cv::Point2f pts[3]);
+        float compute_product(pcl::PointXYZ p, cv::Point2f a, cv::Point2f b);
         void set(int i, int j, int val);
         void set(pcl::PointXYZ& p, int val);
         int get(int i, int j);
