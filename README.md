@@ -10,5 +10,5 @@ This installation has been tested using Ubuntu 14.04 running ROS Indigo
 
     cd $CATKIN_WS/src
     git clone https://github.com/mit-drl/fogg.git
-    cd -
+    cd ..
     catkin_make
